@@ -9,7 +9,7 @@ public class InventoryDbContext : DbContext, IInventoryEntities
     {
     }
 
-    public DbSet<Product> Products { get; set; } = null!;
+    internal DbSet<Product> Products { get; set; } = null!;
 
     public IQueryable<Product> ProductEntities => Set<Product>();
     public Product? FindProduct(int id) => Find<Product>(id);

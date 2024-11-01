@@ -14,45 +14,14 @@ public class ProductService : IProductService
     }
     readonly IInventoryEntities context;
     #endregion
-
-    #region Mapping
-    static ProductDetail MapToDetail(Product product)
-    {
-        if (product == null)
-            throw new ArgumentNullException(nameof(product));
-
-        return new ProductDetail
-        {
-            Id = product.Id,
-            Code = product.Code,
-            Name = product.Name,
-            Price = product.Price,
-            Quantity = product.Quantity
-        };
-    }
-    static Product MapToEntity(ProductDetail detail)
-    {
-        if (detail == null)
-            throw new ArgumentNullException(nameof(detail));
-
-        return new Product
-        {
-            Id = detail.Id,
-            Code = detail.Code,
-            Name = detail.Name,
-            Price = detail.Price,
-            Quantity = detail.Quantity
-        };
-    }
-    #endregion
-
+     
     #region Get
     public async Task<ServiceResult<IEnumerable<ProductDetail>>> GetProductsAsync()
     {
         try
         {
             var query = await (from x in context.ProductEntities select x).AsNoTracking().ToListAsync();
-            var products = query.Select(MapToDetail);
+            var products = query.Select(EntitiesMapper.MapToDetail);
             return ServiceResult<IEnumerable<ProductDetail>>.Sucess(products);
         }
         catch (Exception ex)
@@ -68,7 +37,7 @@ public class ProductService : IProductService
 
             return product == null
                 ? ServiceResult<ProductDetail>.Failure($"Product with ID {id} not found")
-                : ServiceResult<ProductDetail>.Sucess(MapToDetail(product));
+                : ServiceResult<ProductDetail>.Sucess(EntitiesMapper.MapToDetail(product));
         }
         catch (Exception ex)
         {
@@ -90,11 +59,11 @@ public class ProductService : IProductService
             if (await context.ProductEntities.AnyAsync(p => p.Code == productDetail.Code))
                 return ServiceResult<ProductDetail>.Failure($"Product with code {productDetail.Code} already exists");
 
-            var entity = MapToEntity(productDetail);
+            var entity = EntitiesMapper.MapToEntity(productDetail);
             context.Add(entity);
             await context.SaveChangesAsync();
 
-            return ServiceResult<ProductDetail>.Sucess(MapToDetail(entity));
+            return ServiceResult<ProductDetail>.Sucess(EntitiesMapper.MapToDetail(entity));
         }
         catch (Exception ex)
         {
@@ -125,7 +94,7 @@ public class ProductService : IProductService
 
             await context.SaveChangesAsync();
 
-            return ServiceResult<ProductDetail>.Sucess(MapToDetail(existingProduct));
+            return ServiceResult<ProductDetail>.Sucess(EntitiesMapper.MapToDetail(existingProduct));
         }
         catch (Exception ex)
         {
