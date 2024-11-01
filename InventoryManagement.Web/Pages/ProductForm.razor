@@ -42,7 +42,7 @@
             </div>
 
             <div class="d-flex gap-2">
-                <button type="submit" class="btn btn-primary" @onclick="HandleValidSubmit">Save</button>
+                <button type="submit" class="btn btn-primary">Save</button>
                 <button type="button" class="btn btn-secondary" @onclick="NavigateBack">Cancel</button>
             </div>
         </EditForm>
@@ -57,7 +57,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (Id != 0)
+        if (Id.HasValue)
         {
             var result = await ProductService.GetProductAsync(Id.Value);
             if (result.Success && result.Data != null)
