@@ -2,6 +2,7 @@ using InventoryManagement.Data.Context;
 using InventoryManagement.Server;
 using InventoryManagement.Shared;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,6 +34,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors(policy =>
+    policy.WithOrigins("http://localhost:44354", "https://localhost:44354")
+     .AllowAnyMethod()
+     .AllowAnyHeader()
+     .WithExposedHeaders("Content-Disposition")
+);
 
 app.UseHttpsRedirection();
 app.UseAuthorization();

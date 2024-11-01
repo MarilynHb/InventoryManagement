@@ -1,0 +1,118 @@
+﻿@page "/product"
+@using InventoryManagement.Shared
+@inherits ProductBase
+@inject NavigationManager NavigationManager
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h3>Products</h3>
+    <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("/product/0"))">
+        Add Product
+    </button>
+</div>
+
+@if (Products == null)
+{
+    <div class="d-flex justify-content-center">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+}
+else if (!Products.Any())
+{
+    <div class="alert alert-info">
+        No products found. Click "Add Product" to create one.
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Name</th>
+                    <th>Qty.</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var product in Products)
+                {
+                    <tr>
+                        <td>@product.Code</td>
+                        <td>@product.Name</td>
+                        <td>@product.Quantity</td>
+                        <td>@product.Price.ToString("C")</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-primary"
+                                        @onclick="@(() => NavigationManager.NavigateTo($"/product/{product.Id}"))">
+                                    Edit
+                                </button>
+                                <button class="btn btn-sm btn-danger"
+                                        @onclick="@(() => ShowDeleteConfirmation(product))">
+                                    Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+<div class="modal fade @(showDeleteModal ? "show" : "")"
+     style="display: @(showDeleteModal ? "block" : "none")"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Delete</h5>
+                <button type="button" class="btn-close" @onclick="CloseDeleteModal"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete @(productToDelete?.Name)?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CloseDeleteModal">Cancel</button>
+                <button type="button" class="btn btn-danger" @onclick="DeleteConfirmed">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (showDeleteModal)
+{
+    <div class="modal-backdrop fade show"></div>
+}
+
+@code {
+    private bool showDeleteModal;
+    private ProductDetail? productToDelete;
+
+    private void ShowDeleteConfirmation(ProductDetail product)
+    {
+        productToDelete = product;
+        showDeleteModal = true;
+    }
+
+    private void CloseDeleteModal()
+    {
+        showDeleteModal = false;
+        productToDelete = null;
+    }
+
+    private async Task DeleteConfirmed()
+    {
+        if (productToDelete != null)
+        {
+            await ProductService.DeleteProductAsync(productToDelete.Id);
+            await OnInitializedAsync();
+        }
+        CloseDeleteModal();
+    }
+}

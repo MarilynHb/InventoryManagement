@@ -31,18 +31,23 @@ public class ProductController : ControllerBase
                 : Problem(result.ErrorMessage);
     }
 
-    [HttpPost]
-    public async Task<ActionResult<ProductDetail>> AddProduct(ProductDetail product)
+    [HttpPost("{id}")]
+    public async Task<ActionResult<ProductDetail>> AddProduct(int id, ProductDetail product)
     {
+        if (id != 0) throw new InvalidOperationException("New Product, can't have an id");
         var result = await productService.AddProductAsync(product);
         return result.Success
             ? CreatedAtAction(nameof(GetProduct), new { id = result.Data!.Id }, result.Data)
             : BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut]
-    public async Task<ActionResult<ProductDetail>> UpdateProduct(ProductDetail product)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<ProductDetail>> UpdateProduct(int id, ProductDetail product)
     {
+        if (id != product.Id)
+        {
+            return BadRequest("URL id doesn't match product id");
+        }
         var result = await productService.UpdateProductAsync(product);
         return result.Success
             ? Ok(result.Data)
