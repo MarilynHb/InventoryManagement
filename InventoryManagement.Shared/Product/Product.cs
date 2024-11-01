@@ -11,9 +11,19 @@ public record ProductDetail
     public void Validate()
     {
         if (string.IsNullOrWhiteSpace(Code))
-        {
             throw new InvalidOperationException("Code is required");
-        }
+        if (Code.Length > 50)
+            throw new InvalidOperationException("Code must be less than or equal to 50 characters");
+        if (string.IsNullOrWhiteSpace(Name))
+            throw new InvalidOperationException("Name is required");
+        if (Name.Length > 100)
+            throw new InvalidOperationException("Name must be less than or equal to 100 characters");
+        if (Quantity < 0)
+            throw new InvalidOperationException("Quantity must be greater than or equal to 0");
+        if (Price < 0.01m)
+            throw new InvalidOperationException("Price must be greater than or equal to 0.01");
+        if (Price > 10000)
+            throw new InvalidOperationException("Price must be less than or equal to 10000");
     }
 }
 public interface IProductService

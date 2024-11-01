@@ -16,14 +16,16 @@ public class Product
     public string Code { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(200)]
-    [Column(TypeName = "nvarchar(200)")]
+    [StringLength(100)]
+    [Column(TypeName = "nvarchar(100)")]
     public string Name { get; set; } = string.Empty;
 
     [Required]
+    [Range(0.01, 10000)]
     [Column(TypeName = "decimal(18,2)")]
     public decimal Price { get; set; }
 
     [Required]
+    [Range(0, int.MaxValue)]
     public int Quantity { get; set; }
 }
