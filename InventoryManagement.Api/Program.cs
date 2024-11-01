@@ -36,7 +36,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors(policy =>
-    policy.WithOrigins("http://localhost:44354", "https://localhost:44354")
+    //need to check how to not have this as an issue
+    //policy.WithOrigins("http://localhost:44354", "https://localhost:44354")
+    policy.WithOrigins("http://localhost:7072", "https://localhost:7072")
      .AllowAnyMethod()
      .AllowAnyHeader()
      .WithExposedHeaders("Content-Disposition")

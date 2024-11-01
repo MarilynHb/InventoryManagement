@@ -11,6 +11,7 @@ public class ProductService : IProductService
         this.httpClient = httpClient;
     }
     readonly HttpClient httpClient;
+    const string apiPath = "api/product";
     #endregion
 
     #region Get Product
@@ -34,7 +35,6 @@ public class ProductService : IProductService
             };
         }
     }
-
     public async Task<ServiceResult<ProductDetail>> GetProductAsync(int id)
     {
         try
@@ -55,6 +55,46 @@ public class ProductService : IProductService
             };
         }
     }
+    public async Task<ServiceResult<IEnumerable<ProductDetail>>> SearchProductsByCodeAsync(string code)
+    {
+        try
+        {
+            var response = await httpClient.GetFromJsonAsync<IEnumerable<ProductDetail>>($"api/product/code/{code}");
+            return new ServiceResult<IEnumerable<ProductDetail>>
+            {
+                Success = true,
+                Data = response
+            };
+        }
+        catch (HttpRequestException ex)
+        {
+            return new ServiceResult<IEnumerable<ProductDetail>>
+            {
+                Success = false,
+                ErrorMessage = ex.Message
+            };
+        }
+    }
+    public async Task<ServiceResult<IEnumerable<ProductDetail>>> SearchProductsByNameAsync(string code)
+    {
+        try
+        {
+            var response = await httpClient.GetFromJsonAsync<IEnumerable<ProductDetail>>($"api/product/code/{code}");
+            return new ServiceResult<IEnumerable<ProductDetail>>
+            {
+                Success = true,
+                Data = response
+            };
+        }
+        catch (HttpRequestException ex)
+        {
+            return new ServiceResult<IEnumerable<ProductDetail>>
+            {
+                Success = false,
+                ErrorMessage = ex.Message
+            };
+        }
+    }
     #endregion
 
     #region Add Product
@@ -62,7 +102,7 @@ public class ProductService : IProductService
     {
         try
         {
-            var response = await httpClient.PostAsJsonAsync("api/product/0", product);
+            var response = await httpClient.PostAsJsonAsync(apiPath, product);
             if (response.IsSuccessStatusCode)
             {
                 var addedProduct = await response.Content.ReadFromJsonAsync<ProductDetail>();
@@ -97,7 +137,7 @@ public class ProductService : IProductService
     {
         try
         {
-            var response = await httpClient.PutAsJsonAsync($"api/product/{product.Id}", product);
+            var response = await httpClient.PutAsJsonAsync(apiPath, product);
             if (response.IsSuccessStatusCode)
             {
                 var updatedProduct = await response.Content.ReadFromJsonAsync<ProductDetail>();
@@ -132,7 +172,7 @@ public class ProductService : IProductService
     {
         try
         {
-            var response = await httpClient.DeleteAsync($"api/product/{id}");
+            var response = await httpClient.DeleteAsync($"{apiPath}/{id}");
             return new ServiceResult<bool>
             {
                 Success = response.IsSuccessStatusCode

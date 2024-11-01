@@ -38,7 +38,7 @@ public class ProductServiceTest : InventoryTest
 
         Assert.IsFalse(result.Success);
         Assert.IsNull(result.Data);
-        Assert.IsTrue(result.ErrorMessage != null && result.ErrorMessage.Contains("not found"));
+        Assert.IsTrue(result.IsNotFound);
     }
     #endregion
 
@@ -146,6 +146,7 @@ public class ProductServiceTest : InventoryTest
         var result = await NewProductService().DeleteProductAsync(nonExistentId);
 
         Assert.IsFalse(result.Success);
+        Assert.IsTrue(result.IsNotFound);
     }
     #endregion
 }

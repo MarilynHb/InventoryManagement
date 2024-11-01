@@ -1,4 +1,5 @@
-﻿@page "/product/{Id:int?}"
+﻿@page "/product/add"
+@page "/product/edit/{Id:int}"
 @using InventoryManagement.Shared
 @inherits ProductBase
 @inject NavigationManager NavigationManager
@@ -56,17 +57,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        if (Id.HasValue)
+        if (Id != 0)
         {
             var result = await ProductService.GetProductAsync(Id.Value);
             if (result.Success && result.Data != null)
             {
                 product = result.Data;
             }
-            else
-            {
-                NavigationManager.NavigateTo("/product/0");
-            }
+        }
+        else
+        {
+            NavigationManager.NavigateTo("/product/add");
         }
     }
 
@@ -76,7 +77,7 @@
         try
         {
             product.Validate();
-            if (Id != 0)
+            if (Id.HasValue)
             {
                 result = await ProductService.UpdateProductAsync(product);
             }
@@ -93,7 +94,7 @@
                 ErrorMessage = result.ErrorMessage;
             }
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             ErrorMessage = ex.Message;
         }

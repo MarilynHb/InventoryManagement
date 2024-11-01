@@ -30,6 +30,8 @@ public interface IProductService
 {
     Task<ServiceResult<IEnumerable<ProductDetail>>> GetProductsAsync();
     Task<ServiceResult<ProductDetail>> GetProductAsync(int id);
+    Task<ServiceResult<IEnumerable<ProductDetail>>> SearchProductsByCodeAsync(string code);
+    Task<ServiceResult<IEnumerable<ProductDetail>>> SearchProductsByNameAsync(string name);
     Task<ServiceResult<ProductDetail>> AddProductAsync(ProductDetail product);
     Task<ServiceResult<ProductDetail>> UpdateProductAsync(ProductDetail product);
     Task<ServiceResult<bool>> DeleteProductAsync(int id);

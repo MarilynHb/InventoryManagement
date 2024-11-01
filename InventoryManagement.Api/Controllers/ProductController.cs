@@ -24,35 +24,30 @@ public class ProductController : ControllerBase
     public async Task<ActionResult<ProductDetail>> GetProduct(int id)
     {
         var result = await productService.GetProductAsync(id);
-        return result.Success
+        return result.Success 
             ? Ok(result.Data)
-            : result.ErrorMessage!.Contains("not found")
-                ? NotFound(result.ErrorMessage)
+            : result.IsNotFound 
+                ? NotFound(result.ErrorMessage) 
                 : Problem(result.ErrorMessage);
     }
 
-    [HttpPost("{id}")]
-    public async Task<ActionResult<ProductDetail>> AddProduct(int id, ProductDetail product)
+    [HttpPost]
+    public async Task<ActionResult<ProductDetail>> AddProduct(ProductDetail product)
     {
-        if (id != 0) throw new InvalidOperationException("New Product, can't have an id");
         var result = await productService.AddProductAsync(product);
         return result.Success
             ? CreatedAtAction(nameof(GetProduct), new { id = result.Data!.Id }, result.Data)
             : BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("{id}")]
-    public async Task<ActionResult<ProductDetail>> UpdateProduct(int id, ProductDetail product)
+    [HttpPut]
+    public async Task<ActionResult<ProductDetail>> UpdateProduct(ProductDetail product)
     {
         //TODO Update with exisitng code - return valid error
-        if (id != product.Id)
-        {
-            return BadRequest("URL id doesn't match product id");
-        }
         var result = await productService.UpdateProductAsync(product);
         return result.Success
             ? Ok(result.Data)
-            : result.ErrorMessage!.Contains("not found")
+            : result.IsNotFound
                 ? NotFound(result.ErrorMessage)
                 : Problem(result.ErrorMessage);
     }
@@ -64,11 +59,28 @@ public class ProductController : ControllerBase
         var result = await productService.DeleteProductAsync(id);
         return result.Success
             ? NoContent()
-            : result.ErrorMessage!.Contains("not found")
+            : result.IsNotFound
                 ? NotFound(result.ErrorMessage)
                 : Problem(result.ErrorMessage);
     }
 
-    //[HttpGet("search")]
-    //[HttpGet("searchbycode")]
+    [HttpGet("code/{code}")]
+    public async Task<ActionResult<ProductDetail>> GetProductByCode(string code)
+    {
+        var result = await productService.SearchProductsByCodeAsync(code);
+        return result.Success
+            ? Ok(result.Data)
+            : result.IsNotFound
+                ? NotFound(result.ErrorMessage)
+                : Problem(result.ErrorMessage);
+    }
+
+    [HttpGet("search/{name}")]
+    public async Task<ActionResult<IEnumerable<ProductDetail>>> SearchProductsByName(string name)
+    {
+        var result = await productService.SearchProductsByNameAsync(name);
+        return result.Success
+            ? Ok(result.Data)
+            : Problem(result.ErrorMessage);
+    }
 }

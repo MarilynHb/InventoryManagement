@@ -5,9 +5,38 @@
 
 <div class="d-flex justify-content-between align-items-center mb-3">
     <h3>Products</h3>
-    <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("/product/0"))">
+    <button class="btn btn-primary" @onclick="@(() => NavigationManager.NavigateTo("/product/add"))">
         Add Product
     </button>
+</div>
+
+<div class="row mb-3">
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text">Name</span>
+            <input type="text" class="form-control" placeholder="Search by name..."
+                   @bind="nameFilter" @bind:event="oninput" @onkeyup="FilterProducts" />
+            @if (!string.IsNullOrEmpty(nameFilter))
+            {
+                <button class="btn btn-outline-secondary" @onclick="ClearNameFilter">
+                    <span class="oi oi-x"></span>
+                </button>
+            }
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="input-group">
+            <span class="input-group-text">Code</span>
+            <input type="text" class="form-control" placeholder="Search by code..."
+                   @bind="codeFilter" @bind:event="oninput" @onkeyup="FilterProducts" />
+            @if (!string.IsNullOrEmpty(codeFilter))
+            {
+                <button class="btn btn-outline-secondary" @onclick="ClearCodeFilter">
+                    <span class="oi oi-x"></span>
+                </button>
+            }
+        </div>
+    </div>
 </div>
 
 @if (Products == null)
@@ -18,10 +47,17 @@
         </div>
     </div>
 }
-else if (!Products.Any())
+else if (!FilteredProducts.Any())
 {
     <div class="alert alert-info">
-        No products found. Click "Add Product" to create one.
+        @if (!string.IsNullOrEmpty(nameFilter) || !string.IsNullOrEmpty(codeFilter))
+        {
+            <span>No products found matching your search criteria. <a href="#" @onclick="ClearAllFilters" @onclick:preventDefault>Clear filters</a></span>
+        }
+        else
+        {
+            <span>No products found. Click "Add Product" to create one.</span>
+        }
     </div>
 }
 else
@@ -38,7 +74,7 @@ else
                 </tr>
             </thead>
             <tbody>
-                @foreach (var product in Products)
+                @foreach (var product in FilteredProducts)
                 {
                     <tr>
                         <td>@product.Code</td>
@@ -48,7 +84,7 @@ else
                         <td>
                             <div class="d-flex gap-2">
                                 <button class="btn btn-sm btn-primary"
-                                        @onclick="@(() => NavigationManager.NavigateTo($"/product/{product.Id}"))">
+                                        @onclick="@(() => NavigationManager.NavigateTo($"/product/edit/{product.Id}"))">
                                     Edit
                                 </button>
                                 <button class="btn btn-sm btn-danger"
@@ -63,7 +99,6 @@ else
         </table>
     </div>
 }
-
 
 <div class="modal fade @(showDeleteModal ? "show" : "")"
      style="display: @(showDeleteModal ? "block" : "none")"
@@ -93,6 +128,12 @@ else
 @code {
     private bool showDeleteModal;
     private ProductDetail? productToDelete;
+    private string nameFilter = "";
+    private string codeFilter = "";
+    private IEnumerable<ProductDetail> FilteredProducts => Products?
+        .Where(p => (string.IsNullOrEmpty(nameFilter) || p.Name.Contains(nameFilter, StringComparison.OrdinalIgnoreCase)) &&
+                    (string.IsNullOrEmpty(codeFilter) || p.Code.Contains(codeFilter, StringComparison.OrdinalIgnoreCase)))
+        ?? Enumerable.Empty<ProductDetail>();
 
     private void ShowDeleteConfirmation(ProductDetail product)
     {
@@ -114,5 +155,29 @@ else
             await OnInitializedAsync();
         }
         CloseDeleteModal();
+    }
+
+    private void FilterProducts()
+    {
+        StateHasChanged();
+    }
+
+    private void ClearNameFilter()
+    {
+        nameFilter = "";
+        StateHasChanged();
+    }
+
+    private void ClearCodeFilter()
+    {
+        codeFilter = "";
+        StateHasChanged();
+    }
+
+    private void ClearAllFilters()
+    {
+        nameFilter = "";
+        codeFilter = "";
+        StateHasChanged();
     }
 }

@@ -14,7 +14,7 @@ public class ProductService : IProductService
     }
     readonly IInventoryEntities context;
     #endregion
-     
+
     #region Get
     public async Task<ServiceResult<IEnumerable<ProductDetail>>> GetProductsAsync()
     {
@@ -36,12 +36,32 @@ public class ProductService : IProductService
             var product = await context.ProductEntities.FirstOrDefaultAsync(p => p.Id == id);
 
             return product == null
-                ? ServiceResult<ProductDetail>.Failure($"Product with ID {id} not found")
+                ? ServiceResult<ProductDetail>.Failure($"Product with ID {id} not found", true)
                 : ServiceResult<ProductDetail>.Sucess(EntitiesMapper.MapToDetail(product));
         }
         catch (Exception ex)
         {
             return ServiceResult<ProductDetail>.Failure($"Failed to retrieve product: {ex.Message}");
+        }
+    }
+    public async Task<ServiceResult<IEnumerable<ProductDetail>>> SearchProductsByCodeAsync(string code)
+    {
+        return await SearchProduct(x => x.Code.Contains(code));
+    }
+    public async Task<ServiceResult<IEnumerable<ProductDetail>>> SearchProductsByNameAsync(string name)
+    {
+        return await SearchProduct(x => x.Name.Contains(name));
+    }
+    async Task<ServiceResult<IEnumerable<ProductDetail>>> SearchProduct(Func<Product, bool> predicate)
+    {
+        try
+        {
+            var products = await (from x in context.ProductEntities where predicate(x) select EntitiesMapper.MapToDetail(x)).AsNoTracking().ToListAsync();
+            return ServiceResult<IEnumerable<ProductDetail>>.Sucess(products);
+        }
+        catch (Exception ex)
+        {
+            return ServiceResult<IEnumerable<ProductDetail>>.Failure($"Failed to retrieve products: {ex.Message}");
         }
     }
     #endregion
@@ -83,7 +103,7 @@ public class ProductService : IProductService
 
             var existingProduct = await context.ProductEntities.FirstOrDefaultAsync(p => p.Id == productDetail.Id);
             if (existingProduct == null)
-                return ServiceResult<ProductDetail>.Failure($"Product with ID {productDetail.Id} not found");
+                return ServiceResult<ProductDetail>.Failure($"Product with ID {productDetail.Id} not found", true);
 
             var existingCode = (from x in context.ProductEntities where x.Code == productDetail.Code && x.Id != productDetail.Id select x).FirstOrDefault();
             if (existingCode != null)
@@ -113,7 +133,7 @@ public class ProductService : IProductService
             var product = context.FindProduct(id);
 
             if (product == null)
-                return ServiceResult<bool>.Failure($"Product with ID {id} not found");
+                return ServiceResult<bool>.Failure($"Product with ID {id} not found", true);
             context.Remove(product);
             await context.SaveChangesAsync();
             return ServiceResult<bool>.Sucess(true);
