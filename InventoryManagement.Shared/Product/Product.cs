@@ -7,13 +7,21 @@ public record ProductDetail
     public required string Name { get; set; }
     public required decimal Price { get; set; }
     public required int Quantity { get; set; }
-}
 
+    public void Validate()
+    {
+        if (string.IsNullOrWhiteSpace(Code))
+        {
+            throw new InvalidOperationException("Code is required");
+        }
+    }
+}
 public interface IProductService
 {
-    IEnumerable<ProductDetail> GetProducts();
-    //ProductDetail GetProductAsync(int id);
-    //ProductDetail AddProductAsync(ProductDetail product);
-    //ProductDetail UpdateProductAsync(ProductDetail product);
-    //Task DeleteProductAsync(int id);
+    Task<ServiceResult<IEnumerable<ProductDetail>>> GetProductsAsync();
+    Task<ServiceResult<ProductDetail>> GetProductAsync(int id);
+    Task<ServiceResult<ProductDetail>> AddProductAsync(ProductDetail product);
+    Task<ServiceResult<ProductDetail>> UpdateProductAsync(ProductDetail product);
+    Task<ServiceResult<bool>> DeleteProductAsync(int id);
+
 }
