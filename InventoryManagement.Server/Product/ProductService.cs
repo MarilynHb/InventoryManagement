@@ -56,7 +56,8 @@ public class ProductService : IProductService
 
             productDetail.Validate();
 
-            if (await context.ProductEntities.AnyAsync(p => p.Code == productDetail.Code))
+            var existingCode = (from x in context.ProductEntities where x.Code == productDetail.Code select x).FirstOrDefault();
+            if (existingCode != null)
                 return ServiceResult<ProductDetail>.Failure($"Product with code {productDetail.Code} already exists");
 
             var entity = EntitiesMapper.MapToEntity(productDetail);
@@ -84,7 +85,8 @@ public class ProductService : IProductService
             if (existingProduct == null)
                 return ServiceResult<ProductDetail>.Failure($"Product with ID {productDetail.Id} not found");
 
-            if (await context.ProductEntities.AnyAsync(p => p.Code == productDetail.Code && p.Id != productDetail.Id))
+            var existingCode = (from x in context.ProductEntities where x.Code == productDetail.Code && x.Id != productDetail.Id select x).FirstOrDefault();
+            if (existingCode != null)
                 return ServiceResult<ProductDetail>.Failure($"Product with code {productDetail.Code} already exists");
 
             existingProduct.Code = productDetail.Code;

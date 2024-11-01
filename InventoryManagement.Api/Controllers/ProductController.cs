@@ -44,6 +44,7 @@ public class ProductController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<ProductDetail>> UpdateProduct(int id, ProductDetail product)
     {
+        //TODO Update with exisitng code - return valid error
         if (id != product.Id)
         {
             return BadRequest("URL id doesn't match product id");
@@ -53,7 +54,7 @@ public class ProductController : ControllerBase
             ? Ok(result.Data)
             : result.ErrorMessage!.Contains("not found")
                 ? NotFound(result.ErrorMessage)
-                : BadRequest(result.ErrorMessage);
+                : Problem(result.ErrorMessage);
     }
 
 
