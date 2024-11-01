@@ -21,10 +21,6 @@ public class InventoryDbContextFactory : IDesignTimeDbContextFactory<InventoryDb
 
         optionsBuilder.UseSqlServer(connectionString, sqlOptions =>
         {
-            sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 3,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null);
             sqlOptions.CommandTimeout(30);
         });
 

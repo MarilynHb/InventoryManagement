@@ -26,10 +26,6 @@ builder.Services.AddDbContext<InventoryDbContext>(options =>
         builder.Configuration.GetConnectionString("InventoryDatabase"),
         sqlOptions =>
         {
-            sqlOptions.EnableRetryOnFailure(
-                maxRetryCount: 3,
-                maxRetryDelay: TimeSpan.FromSeconds(30),
-                errorNumbersToAdd: null);
             sqlOptions.CommandTimeout(30);
         }
     )

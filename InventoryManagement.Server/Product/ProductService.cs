@@ -44,6 +44,9 @@ public class ProductService : IProductService
             return ServiceResult<ProductDetail>.Failure($"Failed to retrieve product: {ex.Message}");
         }
     }
+    #endregion
+
+    #region Search
     public async Task<ServiceResult<IEnumerable<ProductDetail>>> SearchProductsByCodeAsync(string code)
     {
         return await SearchProduct(x => x.Code.Contains(code));
