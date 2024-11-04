@@ -19,14 +19,14 @@ Solution Structure
 ### Implementation Highlights
 
 - **Clean Architecture**: Each layer has a single responsibility, making the code maintainable and testable
-- **Modern Tech Stack**: Built with .NET 7, Entity Framework Core, and Blazor
+- **Modern Tech Stack**: Built with .NET 8, Entity Framework Core, and Blazor
 - **API Documentation**: Swagger integration for easy API testing
 - **Automated Tests**: In-memory database testing for business logic validation
 
 ## Running the Project
 
 1. **Prerequisites**
-   - .NET 7.0 SDK
+   - .NET 8.0 SDK
    - SQL Server
 
 2. **Setup**
